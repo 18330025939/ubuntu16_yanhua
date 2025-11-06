@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  build_env:
+    image: "${DOCKER_IMAGE_NAME}:${DOCKER_BASE_TAG}"
+    container_name: "${USER}_${MODEL_NAME}"
+    tty: true
+    volumes:
+      - "/home/lrj/ubuntu16_yanhua:/home/${USER}/ubuntu16_yanhua"
+      - "/etc/localtime:/etc/localtime:ro"
+    working_dir: "/home/${USER}"
+    environment:
+      - CROSS_COMPILE=gcc
+      - LANG=${LANG}
+      - USER=${USER}
+    privileged: true
+    command:
+      - /bin/bash
+      - -c
+      - |
+        groupadd ${USER} -g ${GROUP_ID}
+        useradd --system --create-home --no-log-init -u ${USER_ID} -g ${GROUP_ID} ${USER}
+        usermod -aG sudo ${USER}
+        echo '%sudo ALL=(ALL:ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo
+        tail -f /dev/null
+
